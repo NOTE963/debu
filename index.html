@@ -390,6 +390,7 @@
   var weight = WEIGHT_START;
   var satiety = 0;
   var lockedUntil = 0;
+  var wasLocked = false;
   var startTime = 0, lastFrame = 0, elapsed = 0, lossRate = 5;
 
   function isFull(){ return performance.now() < lockedUntil; }
@@ -406,7 +407,7 @@
   }
 
   function resetGame(){
-    weight = WEIGHT_START; elapsed = 0; lossRate = 5; satiety = 0; lockedUntil = 0;
+    weight = WEIGHT_START; elapsed = 0; lossRate = 5; satiety = 0; lockedUntil = 0; wasLocked = false;
     foods.forEach(function(f){ if(f.el && f.el.parentNode) f.el.parentNode.removeChild(f.el); });
     foods = [];
     heldMap = {};
@@ -584,6 +585,10 @@
     var satietyDecayRate = SATIETY_DECAY_PER_SEC + 4 * Math.floor(elapsed / 10);
     if(isFull()){
       satiety = SATIETY_MAX;
+      wasLocked = true;
+    } else if(wasLocked){
+      satiety = 0;
+      wasLocked = false;
     } else {
       satiety = Math.max(0, satiety - satietyDecayRate * dt);
     }
